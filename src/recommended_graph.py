@@ -1,5 +1,5 @@
 """
-recommend_graph.py — Graph-Based Menu Recommendation Engine
+recommended_graph.py — Graph-Based Menu Recommendation Engine
 ============================================================
 Models co-occurrence of menu items as an undirected weighted graph.
 

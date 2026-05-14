@@ -5,7 +5,7 @@ Uses set theory: items grouped into named sets by category.
 Supports membership queries, category intersection, and filtering.
 """
 
-# ── Menu items: each entry is a dict with price, category, description ──
+# ── Menu items: eachx entry is a dict with price, category, description ──
 MENU_ITEMS = {
     # Main Course
     "burger":      {"price": 5.99,  "category": "main",    "desc": "Beef burger with lettuce & tomato"},

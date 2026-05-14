@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from fsm             import FSM, State
 from order_tree      import OrderTree
-from recommend_graph import RecommendationGraph
+from recommended_graph import RecommendationGraph
 from rules           import print_rule_check, has_blocking_violation, evaluate_rules
 from menu            import display_menu, MENU_ITEMS, COMBOS
 
