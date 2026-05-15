@@ -31,19 +31,19 @@ MENU_ITEMS = {
 
 # ── Combo definitions: base item + included sub-items + combo price ──
 COMBOS = {
-    "burger_combo": {
+    "burger combo": {
         "base":     "burger",
         "includes": ["fries", "coke"],
         "price":    8.49,
         "desc":     "Burger + Fries + Coke",
     },
-    "pasta_combo": {
+    "pasta combo": {
         "base":     "pasta",
         "includes": ["salad", "juice"],
         "price":    9.49,
         "desc":     "Pasta + Salad + Juice",
     },
-    "shawarma_combo": {
+    "shawarma combo": {
         "base":     "shawarma",
         "includes": ["fries", "coke"],
         "price":    7.99,
@@ -86,26 +86,60 @@ def get_item_price(name: str) -> float:
     raise KeyError(f"Item '{name}' not found in menu.")
 
 
+def get_all_items_in_order() -> list:
+    """Returns a list of all item names in the order they are displayed."""
+    ordered = []
+    categories = ["main", "side", "drink", "dessert"]
+    for cat in categories:
+        items = sorted([name for name, info in MENU_ITEMS.items() if info["category"] == cat])
+        ordered.extend(items)
+    ordered.extend(sorted(COMBOS.keys()))
+    return ordered
+
+
+def get_item_name(input_str: str) -> str:
+    """
+    Given a string (either a number or a name), return the canonical item name.
+    Returns the original string if it's not a valid number.
+    """
+    all_items = get_all_items_in_order()
+    try:
+        idx = int(input_str) - 1
+        if 0 <= idx < len(all_items):
+            return all_items[idx]
+    except ValueError:
+        pass
+    return input_str
+
+
 def display_menu():
-    """Pretty-print the full menu, grouped by category."""
+    """Pretty-print the full menu, grouped by category, with numbers."""
     print("\n" + "═" * 55)
     print("           🍽️  RESTAURANT ORDERING SYSTEM")
     print("═" * 55)
 
+    all_items = get_all_items_in_order()
     categories = {"main": "🍔 Main Course", "side": "🍟 Sides",
                   "drink": "🥤 Beverages",  "dessert": "🍰 Desserts"}
 
+    counter = 1
     for cat_key, cat_label in categories.items():
-        items = {k: v for k, v in MENU_ITEMS.items() if v["category"] == cat_key}
-        if items:
+        cat_items = sorted([k for k, v in MENU_ITEMS.items() if v["category"] == cat_key])
+        if cat_items:
             print(f"\n  {cat_label}")
             print("  " + "─" * 50)
-            for name, info in items.items():
-                print(f"  {name:<14} ${info['price']:.2f}   {info['desc']}")
+            for name in cat_items:
+                info = MENU_ITEMS[name]
+                print(f"  {counter:2}. {name:<14} ${info['price']:.2f}   {info['desc']}")
+                counter += 1
 
     print(f"\n  🎁 Combo Deals")
     print("  " + "─" * 50)
-    for name, info in COMBOS.items():
-        print(f"  {name:<20} ${info['price']:.2f}   {info['desc']}")
+    combo_names = sorted(COMBOS.keys())
+    for name in combo_names:
+        info = COMBOS[name]
+        print(f"  {counter:2}. {name:<20} ${info['price']:.2f}   {info['desc']}")
+        counter += 1
 
     print("\n" + "═" * 55)
+

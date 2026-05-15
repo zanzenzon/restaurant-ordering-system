@@ -15,7 +15,7 @@ from fsm             import FSM, State
 from order_tree      import OrderTree
 from recommended_graph import RecommendationGraph
 from rules           import print_rule_check, has_blocking_violation, evaluate_rules
-from menu            import display_menu, MENU_ITEMS, COMBOS
+from menu            import display_menu, MENU_ITEMS, COMBOS, get_item_name
 
 
 # ── Colour helpers (ANSI — degrade gracefully on Windows) ─────────────
@@ -59,15 +59,17 @@ def run():
 
             elif cmd == "2" or cmd.startswith("2 ") or cmd.startswith("add "):
                 if cmd == "2" or cmd == "add":
-                    item = input("  │  Enter item name: ").strip().lower()
+                    item_input = input("  │  Enter item name or number: ").strip().lower()
                 elif cmd.startswith("2 "):
-                    item = cmd[2:].strip()
+                    item_input = cmd[2:].strip()
                 else:
-                    item = cmd[4:].strip()
+                    item_input = cmd[4:].strip()
                 
-                if not item:
+                if not item_input:
                     print(yellow("  ⚠  No item specified."))
                     continue
+
+                item = get_item_name(item_input)
 
                 ok = tree.add_item(item)
                 if ok:
@@ -83,15 +85,17 @@ def run():
 
             elif cmd == "3" or cmd.startswith("3 ") or cmd.startswith("remove "):
                 if cmd == "3" or cmd == "remove":
-                    item = input("  │  Enter item name to remove: ").strip().lower()
+                    item_input = input("  │  Enter item name or number to remove: ").strip().lower()
                 elif cmd.startswith("3 "):
-                    item = cmd[2:].strip()
+                    item_input = cmd[2:].strip()
                 else:
-                    item = cmd[7:].strip()
+                    item_input = cmd[7:].strip()
 
-                if not item:
+                if not item_input:
                     print(yellow("  ⚠  No item specified."))
                     continue
+
+                item = get_item_name(item_input)
 
                 ok = tree.remove_item(item)
                 if ok:
