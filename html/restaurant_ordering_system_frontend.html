@@ -1,1 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Zara Bites | Smart Ordering System with DM Core</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --brand:#C84B31;--brand-dark:#9e3521;--brand-light:#fdf1ee;
+      --gold:#D4A853;--cream:#FBF7F2;--dark:#1a1a1a;
+      --surface:#ffffff;--muted:#6b6b6b;
+      --border:#e9e2da;
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh}
+    .app{max-width:900px;margin:0 auto;padding:0 0 60px}
 
+    .hero{background:#1a1a1a;color:#fff;padding:28px 24px 20px;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&q=80') center/cover;opacity:.3}
+    .hero-inner{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-icon{width:44px;height:44px;background:var(--brand);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:#fff}
+    .brand-name{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#fff}
+    .brand-tagline{font-size:11px;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase}
+    .cart-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s}
+    .cart-btn:hover{background:rgba(255,255,255,.2)}
+    .cart-badge{background:var(--brand);color:#fff;border-radius:100px;padding:1px 7px;font-size:11px;font-weight:500}
+
+    .order-type-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .order-type-bar label{font-size:12px;color:var(--muted);font-weight:500;margin-right:4px;text-transform:uppercase;letter-spacing:.06em}
+    .ot-btn{padding:7px 16px;border-radius:100px;border:1px solid var(--border);background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;color:var(--dark);transition:.15s;display:flex;align-items:center;gap:5px}
+    .ot-btn.active{background:var(--brand);border-color:var(--brand);color:#fff}
+    .ot-btn:hover:not(.active){border-color:var(--brand);color:var(--brand)}
+
+    .menu-panel{padding:20px 24px}
+    .section-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;color:var(--dark)}
+    .section-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+    .cat-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+    .cat-tab{padding:6px 14px;border-radius:100px;border:1px solid var(--border);background:transparent;font-size:12px;font-weight:500;cursor:pointer;transition:.15s;color:var(--muted)}
+    .cat-tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+    .cat-tab:hover:not(.active){border-color:var(--brand);color:var(--brand)}
+
+    .item-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .item-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.15s;cursor:default}
+    .item-card:hover{border-color:rgba(200,75,49,.3)}
+    .item-img{width:100%;height:100px;object-fit:cover;background:#eee}
+    .item-img-placeholder{width:100%;height:100px;background:linear-gradient(135deg,#f5e6d3,#e8d5c4);display:flex;align-items:center;justify-content:center;font-size:28px}
+    .item-info{padding:10px 12px}
+    .item-name{font-weight:500;font-size:13px;margin-bottom:2px}
+    .item-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-bottom:8px}
+    .item-footer{display:flex;align-items:center;justify-content:space-between}
+    .item-price{font-weight:500;font-size:14px;color:var(--brand)}
+    .combo-badge{font-size:10px;background:#fff8e7;color:#c68a00;border:1px solid #f0d080;padding:2px 7px;border-radius:100px;font-weight:500}
+    .qty-ctrl{display:flex;align-items:center;gap:4px}
+    .qty-btn{width:26px;height:26px;border-radius:100px;border:1px solid var(--border);background:transparent;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;color:var(--dark)}
+    .qty-btn:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+    .qty-num{font-size:13px;font-weight:500;min-width:16px;text-align:center}
+
+    .cart-panel{background:var(--surface);border-left:1px solid var(--border);padding:20px 18px;display:flex;flex-direction:column}
+    .cart-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:4px}
+    .cart-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+    .cart-empty{text-align:center;color:var(--muted);font-size:13px;padding:32px 0;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+    .cart-items{flex:1;overflow-y:auto;max-height:340px;margin-bottom:12px}
+    .cart-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+    .ci-name{flex:1;font-size:13px;font-weight:500}
+    .ci-qty{font-size:11px;color:var(--muted)}
+    .ci-price{font-size:13px;font-weight:500;color:var(--brand)}
+    .ci-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px;transition:.1s}
+    .ci-remove:hover{color:#e24b4a}
+
+    .cart-summary{border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px}
+    .summary-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    .summary-row.discount{color:#639922}
+    .summary-total{display:flex;justify-content:space-between;font-size:15px;font-weight:500;color:var(--dark);margin-top:4px}
+
+    .recs{background:var(--brand-light);border-radius:10px;padding:12px;margin-bottom:12px}
+    .recs-title{font-size:11px;font-weight:500;color:var(--brand);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+    .rec-item{display:flex;align-items:center;justify-content:space-between;font-size:12px;padding:3px 0;gap:6px}
+    .rec-name{color:var(--dark)}
+    .rec-price{color:var(--muted)}
+    .rec-add{background:var(--brand);color:#fff;border:none;border-radius:100px;padding:2px 10px;font-size:11px;cursor:pointer;transition:.1s}
+    .rec-add:hover{background:var(--brand-dark)}
+
+    .rule-alerts{margin-bottom:10px}
+    .rule-alert{font-size:11px;padding:7px 10px;border-radius:8px;margin-bottom:4px;display:flex;align-items:flex-start;gap:5px}
+    .rule-alert.info{background:#e6f1fb;color:#185fa5}
+    .rule-alert.warn{background:#faeeda;color:#854f0b}
+    .rule-alert.block{background:#fcebeb;color:#a32d2d}
+    .rule-alert.ok{background:#eaf3de;color:#3b6d11}
+
+    .checkout-btn{width:100%;padding:13px;background:var(--brand);color:#fff;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:.15s}
+    .checkout-btn:hover:not(:disabled){background:var(--brand-dark)}
+    .checkout-btn:disabled{opacity:.45;cursor:not-allowed}
+    .secondary-btn{width:100%;padding:10px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;margin-top:6px;transition:.15s}
+    .secondary-btn:hover{border-color:var(--brand);color:var(--brand)}
+
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px);}
+    .modal{background:#ffffff;border-radius:28px;padding:28px;max-width:480px;width:100%;box-shadow:0 25px 45px rgba(0,0,0,0.25);border:1px solid rgba(0,0,0,0.05);}
+    .modal h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px}
+    .modal-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+    .modal-items{background:#f9f6f2;border-radius:14px;padding:12px;margin-bottom:16px;max-height:200px;overflow-y:auto}
+    .modal-item-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+    .modal-totals{margin-bottom:20px}
+    .modal-total-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:5px}
+    .modal-total-row.big{font-size:16px;font-weight:600;color:var(--dark);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);}
+    .modal-type-badge{display:inline-flex;align-items:center;gap:5px;background:var(--brand-light);color:var(--brand);font-size:12px;font-weight:500;padding:5px 12px;border-radius:100px;margin-bottom:16px}
+    .modal-actions{display:flex;gap:10px}
+    .modal-actions button{flex:1;padding:12px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:.15s;font-weight:500}
+    .btn-cancel-modal{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-cancel-modal:hover{border-color:#e24b4a;color:#e24b4a}
+    .btn-pay{background:var(--brand);border:none;color:#fff}
+    .btn-pay:hover{background:var(--brand-dark)}
+    .btn-new-order{background:var(--brand);border:none;color:#fff;width:100%;padding:12px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;margin-top:12px}
+    .success-icon{width:64px;height:64px;background:#eaf3de;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:30px;color:#3b6d11}
+    .delivery-form-row{margin-bottom:14px;text-align:left;}
+    .delivery-form-row label{font-size:12px;font-weight:500;color:var(--muted);display:block;margin-bottom:4px;}
+    .delivery-form-row input{width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);font-family:'DM Sans';font-size:13px;background:white;}
+    .delivery-form-row input:focus{outline:none;border-color:var(--brand);}
+
+    .history-panel{padding:20px 24px}
+    .history-empty{text-align:center;color:var(--muted);font-size:13px;padding:32px 0}
+    .history-order{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+    .ho-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+    .ho-id{font-size:13px;font-weight:500}
+    .ho-date{font-size:11px;color:var(--muted)}
+    .ho-badge{font-size:10px;padding:3px 8px;border-radius:100px;font-weight:500}
+    .ho-badge.completed{background:#eaf3de;color:#3b6d11}
+    .ho-items{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .ho-footer{display:flex;justify-content:space-between;align-items:center}
+    .ho-total{font-size:14px;font-weight:500;color:var(--brand)}
+    .ho-type{font-size:11px;color:var(--muted)}
+    .dm-badge{background:#f0e7db;border-radius:50px;font-size:9px;padding:2px 6px;display:inline-block;margin-left:6px;color:#654321;}
+
+    .nav-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
+    .nav-tab{flex:1;padding:14px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);transition:.15s}
+    .nav-tab.active{border-bottom-color:var(--brand);color:var(--brand)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="hero"><div class="hero-inner"><div class="brand"><div class="brand-icon">Z</div><div><div class="brand-name">Zara Bites</div><div class="brand-tagline">Fresh · Fast · Flavourful</div></div></div><button class="cart-btn" onclick="showTab('cart-tab')"><span>🛍️</span> My Order <span class="cart-badge" id="cart-count">0</span></button></div></div>
+  <div class="order-type-bar"><label>Order as:</label><button class="ot-btn active" id="ot-dine" onclick="setOrderType('dine-in',this)"><span>🍽️</span> Dine In</button><button class="ot-btn" id="ot-take" onclick="setOrderType('takeaway',this)"><span>🛍️</span> Takeaway</button><button class="ot-btn" id="ot-del" onclick="setOrderType('delivery',this)"><span>🛵</span> Delivery</button></div>
+  <div class="nav-tabs"><div class="nav-tab active" id="tab-menu" onclick="showTab('menu-tab')">📖 Menu</div><div class="nav-tab" id="tab-cart" onclick="showTab('cart-tab')">🛒 Cart <span id="cart-nav-badge"></span></div><div class="nav-tab" id="tab-history" onclick="showTab('history-tab')">⏱️ History</div></div>
+  <div class="tab-content active" id="menu-tab"><div class="menu-panel"><div class="section-title">What are you having? <span class="dm-badge">DM: Graph+Matrix+FSM</span></div><div class="section-sub" id="menu-sub">Dine In · Cairo Branch</div><div class="cat-tabs" id="cat-tabs"></div><div class="item-grid" id="item-grid"></div></div></div>
+  <div class="tab-content" id="cart-tab"><div class="cart-panel"><div class="cart-title">Your Order</div><div class="cart-sub" id="cart-order-type-label">Dine In</div><div id="cart-body"></div><div id="rule-alerts" class="rule-alerts"></div><div id="recs-block"></div><div id="cart-actions"></div></div></div>
+  <div class="tab-content" id="history-tab"><div class="history-panel"><div class="section-title">Order History <span class="dm-badge">automata logs</span></div><div class="section-sub">Your past orders at Zara Bites</div><div id="history-body"></div></div></div>
+</div>
+<div class="modal-backdrop" id="checkout-modal" style="display:none"><div class="modal" id="modal-inner"></div></div>
+
+<script>
+// ---------- DATA ----------
+const MENU = {
+  main:[{id:'burger',name:'Classic Burger',price:5.99,desc:'Beef patty, lettuce & tomato',img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80'},
+    {id:'pasta',name:'Creamy Pasta',price:6.49,desc:'Fettuccine Alfredo',img:'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=300&q=80'},
+    {id:'pizza',name:'Margherita Pizza',price:7.99,desc:'Tomato, mozzarella',img:'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=300&q=80'},
+    {id:'sandwich',name:'Grilled Sandwich',price:4.49,desc:'Chicken, aioli',img:'https://images.unsplash.com/photo-1528736235302-52922df5c122?w=300&q=80'},
+    {id:'shawarma',name:'Chicken Shawarma',price:5.49,desc:'Wrap, garlic sauce',img:'https://images.unsplash.com/photo-1633321702518-7feccafb94d5?w=300&q=80'}],
+  sides:[{id:'fries',name:'Crispy Fries',price:1.99,desc:'Golden seasoned',img:'https://images.unsplash.com/photo-1518013431117-eb1465fa5752?w=300&q=80'},
+    {id:'salad',name:'Garden Salad',price:2.49,desc:'Fresh greens',img:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&q=80'},
+    {id:'onion_rings',name:'Onion Rings',price:2.29,desc:'Beer-battered',img:'https://images.unsplash.com/photo-1639024471283-03518883512d?w=300&q=80'},{id:'coleslaw',name:'Coleslaw',price:1.79,desc:'Creamy cabbage',img:'https://images.unsplash.com/photo-1607532941433-304659e8198a?w=300&q=80'}],
+  drinks:[{id:'coke',name:'Coca-Cola',price:1.49,desc:'Ice cold',img:'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=300&q=80'},{id:'juice',name:'Orange Juice',price:1.99,desc:'Freshly squeezed',img:'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=300&q=80'},{id:'water',name:'Still Water',price:0.99,desc:'500ml',img:'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=300&q=80'},{id:'milkshake',name:'Milkshake',price:2.99,desc:'Chocolate/vanilla',img:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&q=80'}],
+  desserts:[{id:'ice_cream',name:'Ice Cream',price:2.49,desc:'Vanilla scoop',img:'https://images.unsplash.com/photo-1576506295286-5cda18df43e7?w=300&q=80'},{id:'brownie',name:'Warm Brownie',price:2.99,desc:'Chocolate fudge',img:'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=300&q=80'},{id:'cheesecake',name:'Cheesecake',price:3.49,desc:'New York style',img:'https://images.unsplash.com/photo-1524351199678-941a58a3df50?w=300&q=80'}],
+  combos:[{id:'burger_combo',name:'Burger Combo',price:8.49,desc:'Burger+Fries+Coke',includes:['burger','fries','coke'],img:'https://images.unsplash.com/photo-1550547660-d9450f859349?w=300&q=80'},{id:'pasta_combo',name:'Pasta Combo',price:9.49,desc:'Pasta+Salad+Juice',includes:['pasta','salad','juice'],img:'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=300&q=80'},{id:'shawarma_combo',name:'Shawarma Combo',price:7.99,desc:'Shawarma+Fries+Coke',includes:['shawarma','fries','coke'],img:'https://images.unsplash.com/photo-1633321702518-7feccafb94d5?w=300&q=80'}]
+};
+const CO_OCCUR = {burger:['fries','coke','onion_rings'],pasta:['salad','juice','cheesecake'],pizza:['coke','fries','ice_cream'],sandwich:['fries','coke'],shawarma:['fries','coke'],fries:['coke','milkshake'],ice_cream:['brownie']};
+let cart = {}, orderType = 'dine-in', orderHistory = [], orderIdCounter = 1, activeCat = 'all';
+let deliveryAddress = '', deliveryPhone = '';
+const catLabels = {all:'All',main:'Mains',sides:'Sides',drinks:'Drinks',desserts:'Desserts',combos:'Combos'};
+function allItems(){return [...MENU.main,...MENU.sides,...MENU.drinks,...MENU.desserts,...MENU.combos];}
+function getItem(id){return allItems().find(i=>i.id===id);}
+function setOrderType(type,btn){ orderType=type; document.querySelectorAll('.ot-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); const labels={'dine-in':'Dine In · Cairo Branch','takeaway':'Takeaway · Ready in ~20 min','delivery':'Delivery · Est. 35-45 min'}; document.getElementById('menu-sub').textContent=labels[type]; document.getElementById('cart-order-type-label').textContent=type==='dine-in'?'Dine In':type==='takeaway'?'Takeaway':'Delivery'; renderCart(); }
+function showTab(tabId){ document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); document.getElementById(tabId).classList.add('active'); const map={'menu-tab':'tab-menu','cart-tab':'tab-cart','history-tab':'tab-history'}; document.getElementById(map[tabId]).classList.add('active'); if(tabId==='cart-tab')renderCart(); if(tabId==='history-tab')renderHistory(); }
+function renderMenu(){ const tabsDiv=document.getElementById('cat-tabs'); tabsDiv.innerHTML=''; ['all','main','sides','drinks','desserts','combos'].forEach(cat=>{ const b=document.createElement('button'); b.className='cat-tab'+(cat===activeCat?' active':''); b.textContent=catLabels[cat]; b.onclick=()=>{activeCat=cat;renderMenu();}; tabsDiv.appendChild(b); }); const grid=document.getElementById('item-grid'); grid.innerHTML=''; let items=activeCat==='all'?allItems():(MENU[activeCat==='main'?'main':activeCat==='sides'?'sides':activeCat==='drinks'?'drinks':activeCat==='desserts'?'desserts':'combos']||[]); items.forEach(item=>{ const qty=cart[item.id]||0; const isCombo=MENU.combos.find(c=>c.id===item.id); const card=document.createElement('div'); card.className='item-card'; card.innerHTML=`<img class="item-img" src="${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" loading="lazy"><div class="item-img-placeholder" style="display:none">🍽️</div><div class="item-info"><div style="display:flex;align-items:center;gap:5px;margin-bottom:2px"><div class="item-name">${item.name}</div>${isCombo?'<span class="combo-badge">Combo</span>':''}</div><div class="item-desc">${item.desc}</div><div class="item-footer"><div class="item-price">$${item.price.toFixed(2)}</div><div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button><span class="qty-num" id="qty-${item.id}">${qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div></div></div>`; grid.appendChild(card); }); }
+function changeQty(id,delta){ const item=getItem(id); if(!item)return; const prev=cart[id]||0; const next=Math.max(0,prev+delta); if(next===0)delete cart[id]; else cart[id]=next; const el=document.getElementById('qty-'+id); if(el)el.textContent=next; updateCartBadge(); renderCart(); }
+function cartItems(){ return Object.entries(cart).map(([id,qty])=>({...getItem(id),qty})).filter(i=>i.id); }
+function subtotal(){ return cartItems().reduce((s,i)=>s+i.price*i.qty,0); }
+function discount(){ const sub=subtotal(); return sub>20?parseFloat((sub*.1).toFixed(2)):0; }
+function tax(){return parseFloat((subtotal()*.14).toFixed(2));}
+function total(){return parseFloat((subtotal()-discount()+tax()).toFixed(2));}
+function updateCartBadge(){ const count=Object.values(cart).reduce((a,b)=>a+b,0); document.getElementById('cart-count').textContent=count; const nb=document.getElementById('cart-nav-badge'); nb.textContent=count>0?` (${count})`:''; }
+function getItemSet(){return new Set(Object.keys(cart));}
+function evaluateRules(){ const items=getItemSet(); const sub=subtotal(); const alerts=[]; const hasDrink=!!([...items].find(id=>MENU.drinks.find(d=>d.id===id)||MENU.combos.find(c=>c.id===id&&c.includes.some(x=>['coke','juice','water','milkshake'].includes(x))))); if(items.has('burger')&&!items.has('fries')&&!items.has('burger_combo'))alerts.push({type:'info',msg:'💡 Burger pairs great with Fries (+$1.99)'}); if(items.has('pizza')&&!items.has('coke'))alerts.push({type:'info',msg:'💡 Pizza + Coke is a classic combo (+$1.49)'}); if(items.size>0&&!hasDrink)alerts.push({type:'warn',msg:'⚠ No drink in your order — add a beverage?'}); if(sub>20)alerts.push({type:'ok',msg:'🎉 10% discount applied — order over $20!'}); if(items.size>=4&&!items.has('shawarma_combo'))alerts.push({type:'info',msg:'💡 Big order! Shawarma Combo saves money.'}); const conflicts=[]; if(items.has('burger_combo')&&items.has('burger'))conflicts.push('Burger already in Burger Combo'); if(items.has('pasta_combo')&&items.has('pasta'))conflicts.push('Pasta already in Pasta Combo'); if(items.has('shawarma_combo')&&items.has('shawarma'))conflicts.push('Shawarma already in Shawarma Combo'); conflicts.forEach(c=>alerts.push({type:'block',msg:'❌ Conflict: '+c})); if(items.size===0)alerts.push({type:'block',msg:'❌ Add at least one item to place an order'}); return alerts; }
+// Delivery validation is now done inside checkout flow, not blocking the button
+function hasBlockingViolation(){ return evaluateRules().some(r=>r.type==='block'); }
+function getRecs(){ const items=getItemSet(); const scores={}; items.forEach(id=>{(CO_OCCUR[id]||[]).forEach(nb=>{if(!items.has(nb))scores[nb]=(scores[nb]||0)+1;})}); return Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([id])=>getItem(id)).filter(Boolean); }
+function renderCart(){ const items=cartItems(); const rules=evaluateRules(); const recs=getRecs(); const body=document.getElementById('cart-body'); if(items.length===0){ body.innerHTML=`<div class="cart-empty"><span>🛒</span><span>Your cart is empty</span><span style="font-size:11px">Head to the menu to add items</span></div>`; } else { let html=`<div class="cart-items">`; items.forEach(item=>{ html+=`<div class="cart-item"><div style="flex:1"><div class="ci-name">${item.name}</div><div class="ci-qty">× ${item.qty} · $${item.price.toFixed(2)} each</div></div><div class="ci-price">$${(item.price*item.qty).toFixed(2)}</div><button class="ci-remove" onclick="removeFromCart('${item.id}')">✖</button></div>`; }); html+=`</div><div class="cart-summary"><div class="summary-row"><span>Subtotal</span><span>$${subtotal().toFixed(2)}</span></div>${discount()>0?`<div class="summary-row discount"><span>Discount (10%)</span><span>-$${discount().toFixed(2)}</span></div>`:''}<div class="summary-row"><span>Tax (14%)</span><span>$${tax().toFixed(2)}</span></div><div class="summary-total"><span>Total</span><span>$${total().toFixed(2)}</span></div></div>`; body.innerHTML=html; } const ra=document.getElementById('rule-alerts'); ra.innerHTML=rules.map(r=>`<div class="rule-alert ${r.type}">${r.msg}</div>`).join(''); const rb=document.getElementById('recs-block'); if(recs.length>0&&items.length>0){ rb.innerHTML=`<div class="recs"><div class="recs-title">✨ DM Graph-based recommendations (co-occurrence)</div>`+recs.map(r=>`<div class="rec-item"><span class="rec-name">${r.name}</span><span class="rec-price">$${r.price.toFixed(2)}</span><button class="rec-add" onclick="changeQty('${r.id}',1);renderCart()">+ Add</button></div>`).join('')+`</div>`; } else rb.innerHTML=''; const actions=document.getElementById('cart-actions'); const blocked=hasBlockingViolation(); actions.innerHTML=`<button class="checkout-btn" onclick="openCheckout()" ${blocked?'disabled':''}>${blocked?'Resolve issues above':'Review & Place Order →'}</button>${items.length>0?`<button class="secondary-btn" onclick="clearCart()">Clear order</button>`:''}`; }
+function removeFromCart(id){ delete cart[id]; const el=document.getElementById('qty-'+id); if(el)el.textContent='0'; updateCartBadge(); renderCart(); }
+function clearCart(){ Object.keys(cart).forEach(id=>{ delete cart[id]; const el=document.getElementById('qty-'+id); if(el)el.textContent='0';}); updateCartBadge(); renderCart(); }
+function openCheckout(){ 
+  // For delivery, always show the address form first (even if they already entered before)
+  if(orderType === 'delivery'){
+    const modalInner=document.getElementById('modal-inner');
+    modalInner.innerHTML=`<h2>📦 Delivery Information</h2><p class="modal-sub">Please provide your details to complete the order.</p><div class="delivery-form-row"><label>🏠 Full Address</label><input type="text" id="delivery-address-input" placeholder="Street, building, floor, landmark" value="${deliveryAddress}"></div><div class="delivery-form-row"><label>📞 Phone Number</label><input type="tel" id="delivery-phone-input" placeholder="e.g., 01012345678" value="${deliveryPhone}"></div><div class="modal-actions"><button class="btn-cancel-modal" onclick="closeModal()">Cancel</button><button class="btn-pay" onclick="proceedToOrderSummary()">Continue to Summary →</button></div>`;
+    document.getElementById('checkout-modal').style.display='flex';
+    return;
+  }
+  buildOrderSummaryModal();
+}
+function proceedToOrderSummary(){
+  const addr=document.getElementById('delivery-address-input')?.value.trim() || '';
+  const phone=document.getElementById('delivery-phone-input')?.value.trim() || '';
+  if(!addr || !phone){
+    alert('❌ Please fill both address and phone number for delivery');
+    return;
+  }
+  deliveryAddress = addr;
+  deliveryPhone = phone;
+  buildOrderSummaryModal();
+}
+function buildOrderSummaryModal(){
+  const items=cartItems();
+  const disc=discount();
+  const typeLabels={'dine-in':'🍽 Dine In','takeaway':'🛍 Takeaway','delivery':'🛵 Delivery'};
+  let extraInfo='';
+  if(orderType==='delivery') extraInfo=`<div style="background:#f5f0ea;border-radius:12px;padding:10px;margin-bottom:12px;font-size:12px;"><strong>🚚 Delivery to:</strong> ${deliveryAddress}<br/><strong>📞 Contact:</strong> ${deliveryPhone}</div>`;
+  const modal=document.getElementById('modal-inner');
+  modal.innerHTML=`<h2>Order Summary</h2><p class="modal-sub">Review your order before confirming.</p><div class="modal-type-badge">${typeLabels[orderType]}</div>${extraInfo}<div class="modal-items">${items.map(i=>`<div class="modal-item-row"><span>${i.name} × ${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}</div><div class="modal-totals"><div class="modal-total-row"><span>Subtotal</span><span>$${subtotal().toFixed(2)}</span></div>${disc>0?`<div class="modal-total-row" style="color:#3b6d11"><span>Discount (10%)</span><span>-$${disc.toFixed(2)}</span></div>`:''}<div class="modal-total-row"><span>Tax (14%)</span><span>$${tax().toFixed(2)}</span></div><div class="modal-total-row big"><span>Total</span><span>$${total().toFixed(2)}</span></div></div><div class="modal-actions"><button class="btn-cancel-modal" onclick="closeModal()">Go Back</button><button class="btn-pay" onclick="placeOrder()">Confirm & Pay $${total().toFixed(2)}</button></div>`;
+  document.getElementById('checkout-modal').style.display='flex';
+}
+function closeModal(){ document.getElementById('checkout-modal').style.display='none'; }
+function placeOrder(){ 
+  const id='#ZB-'+String(orderIdCounter++).padStart(4,'0'); 
+  const now=new Date(); 
+  const timeStr=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+' · '+now.toLocaleDateString([],{day:'numeric',month:'short'}); 
+  orderHistory.unshift({ id, time:timeStr, type:orderType, items:cartItems().map(i=>({name:i.name,qty:i.qty,price:i.price})), subtotal:subtotal(), discount:discount(), tax:tax(), total:total(), status:'completed', deliveryAddress:orderType==='delivery'?deliveryAddress:null, phone:orderType==='delivery'?deliveryPhone:null }); 
+  const modal=document.getElementById('modal-inner'); 
+  modal.innerHTML=`<div style="text-align:center"><div class="success-icon">✅</div><h2>Order Placed!</h2><p class="modal-sub">Your order ${id} has been confirmed.</p>${orderType==='delivery'?`<p style="font-size:12px;background:#f5f0ea;padding:8px;border-radius:12px;margin:12px 0;">🚚 ${deliveryAddress}<br>📞 ${deliveryPhone}</p>`:''}<p style="font-size:13px;color:var(--muted);margin-bottom:20px">${orderType==='delivery'?'🛵 Delivery ETA: 35-45 min':orderType==='takeaway'?'⏱ Ready in ~20 min':'🍽 Your table is ready'}</p><button class="btn-new-order" onclick="startNewOrder()">Start Fresh Order</button></div>`; 
+  clearCart(); 
+  renderHistory(); 
+}
+function startNewOrder(){ closeModal(); showTab('menu-tab'); renderCart(); }
+function renderHistory(){ 
+  const body=document.getElementById('history-body'); 
+  if(orderHistory.length===0){ body.innerHTML=`<div class="history-empty"><span>📜</span><span>No orders yet — place your first order!</span></div>`; return; } 
+  const typeLabels={'dine-in':'Dine In','takeaway':'Takeaway','delivery':'Delivery'}; 
+  body.innerHTML=orderHistory.map(o=>`<div class="history-order"><div class="ho-header"><div><div class="ho-id">${o.id}</div><div class="ho-date">${o.time}</div></div><span class="ho-badge completed">Completed</span></div><div class="ho-items">${o.items.map(i=>`${i.name} ×${i.qty}`).join(' · ')}</div><div class="ho-footer"><div class="ho-total">$${o.total.toFixed(2)}</div><div class="ho-type">${typeLabels[o.type]||o.type}${o.deliveryAddress?' 📍':''}</div></div></div>`).join(''); 
+}
+document.getElementById('checkout-modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+renderMenu(); renderCart(); renderHistory();
+</script>
+</body>
+</html>
