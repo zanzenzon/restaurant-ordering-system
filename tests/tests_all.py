@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 import unittest
 from fsm             import FSM, State
 from order_tree      import OrderTree, OrderNode
-from recommend_graph import RecommendationGraph
+from recommended_graph import RecommendationGraph
 from rules           import evaluate_rules, has_blocking_violation
 from menu            import get_category_set, items_in_categories, get_item_price
 
