@@ -51,14 +51,24 @@ def run():
 
         # ── STATE: ORDERING ──────────────────────────────────────────
         if fsm.is_ordering():
-            print("  │  Commands: [menu] [add <item>] [remove <item>] [order] [review] [cancel]")
+            print("  │  " + cyan("1. Menu") + "  " + cyan("2. Add Item") + "  " + cyan("3. Remove Item") + "  " + cyan("4. View Order") + "  " + cyan("5. Review") + "  " + cyan("6. Cancel"))
             cmd = input("  └─▶ ").strip().lower()
 
-            if cmd == "menu":
+            if cmd == "1" or cmd == "menu":
                 display_menu()
 
-            elif cmd.startswith("add "):
-                item = cmd[4:].strip()
+            elif cmd == "2" or cmd.startswith("2 ") or cmd.startswith("add "):
+                if cmd == "2" or cmd == "add":
+                    item = input("  │  Enter item name: ").strip().lower()
+                elif cmd.startswith("2 "):
+                    item = cmd[2:].strip()
+                else:
+                    item = cmd[4:].strip()
+                
+                if not item:
+                    print(yellow("  ⚠  No item specified."))
+                    continue
+
                 ok = tree.add_item(item)
                 if ok:
                     fsm.transition("add_item")
@@ -71,64 +81,74 @@ def run():
                     # Show quick recommendations
                     graph.print_recommendations(tree.item_names(), top_n=3)
 
-            elif cmd.startswith("remove "):
-                item = cmd[7:].strip()
+            elif cmd == "3" or cmd.startswith("3 ") or cmd.startswith("remove "):
+                if cmd == "3" or cmd == "remove":
+                    item = input("  │  Enter item name to remove: ").strip().lower()
+                elif cmd.startswith("3 "):
+                    item = cmd[2:].strip()
+                else:
+                    item = cmd[7:].strip()
+
+                if not item:
+                    print(yellow("  ⚠  No item specified."))
+                    continue
+
                 ok = tree.remove_item(item)
                 if ok:
                     fsm.transition("remove_item")
 
-            elif cmd == "order":
+            elif cmd == "4" or cmd == "order":
                 tree.display()
 
-            elif cmd == "review":
+            elif cmd == "5" or cmd == "review":
                 if tree.is_empty():
                     print(red("  ⚠  Order is empty. Add items first."))
                 else:
                     fsm.transition("review")
 
-            elif cmd == "cancel":
+            elif cmd == "6" or cmd == "cancel":
                 fsm.transition("cancel")
 
             else:
-                print(yellow("  Unknown command. Type 'menu' to see the menu."))
+                print(yellow("  Unknown command. Use numbers 1-6 or type the command."))
 
         # ── STATE: REVIEWING ─────────────────────────────────────────
         elif fsm.is_reviewing():
             tree.display()
             print_rule_check(tree.item_names(), tree.subtotal())
-            print("  │  Commands: [confirm] [edit] [cancel]")
+            print("  │  " + cyan("1. Confirm") + "  " + cyan("2. Edit") + "  " + cyan("3. Cancel"))
             cmd = input("  └─▶ ").strip().lower()
 
-            if cmd == "confirm":
+            if cmd == "1" or cmd == "confirm":
                 if has_blocking_violation(tree.item_names(), tree.subtotal()):
                     print(red("  ❌ Cannot confirm — resolve the issues above first."))
                 else:
                     fsm.transition("confirm")
 
-            elif cmd == "edit":
+            elif cmd == "2" or cmd == "edit":
                 fsm.transition("edit")
 
-            elif cmd == "cancel":
+            elif cmd == "3" or cmd == "cancel":
                 fsm.transition("cancel")
 
             else:
-                print(yellow("  Commands: confirm / edit / cancel"))
+                print(yellow("  Unknown command. Use numbers 1-3 or type confirm/edit/cancel."))
 
         # ── STATE: PAYMENT ────────────────────────────────────────────
         elif fsm.is_payment():
             total = tree.total()
             print(f"\n  Total due: {bold(f'${total:.2f}')}")
-            print("  │  Commands: [pay] [cancel]")
+            print("  │  " + cyan("1. Pay") + "  " + cyan("2. Cancel"))
             cmd = input("  └─▶ ").strip().lower()
 
-            if cmd == "pay":
+            if cmd == "1" or cmd == "pay":
                 fsm.transition("pay")
 
-            elif cmd == "cancel":
+            elif cmd == "2" or cmd == "cancel":
                 fsm.transition("cancel")
 
             else:
-                print(yellow("  Commands: pay / cancel"))
+                print(yellow("  Unknown command. Use numbers 1-2 or type pay/cancel."))
 
         # ── STATE: COMPLETED ──────────────────────────────────────────
         elif fsm.is_completed():
@@ -137,10 +157,10 @@ def run():
             tree.display()
             print("  FSM Transition History:")
             fsm.print_history()
-            print("  Commands: [new] [exit]")
+            print("  " + cyan("1. New Order") + "  " + cyan("2. Exit"))
             cmd = input("  └─▶ ").strip().lower()
 
-            if cmd == "new":
+            if cmd == "1" or cmd == "new":
                 tree  = OrderTree()
                 graph = RecommendationGraph()
                 fsm.transition("start")
@@ -151,10 +171,10 @@ def run():
         # ── STATE: CANCELLED ──────────────────────────────────────────
         elif fsm.is_cancelled():
             print(red("\n  Order cancelled."))
-            print("  Commands: [new] [exit]")
+            print("  " + cyan("1. New Order") + "  " + cyan("2. Exit"))
             cmd = input("  └─▶ ").strip().lower()
 
-            if cmd == "new":
+            if cmd == "1" or cmd == "new":
                 tree  = OrderTree()
                 graph = RecommendationGraph()
                 fsm.transition("start")
