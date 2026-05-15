@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
 from fsm             import FSM
 from order_tree      import OrderTree
-from recommend_graph import RecommendationGraph
+from recommended_graph import RecommendationGraph
 from rules           import print_rule_check
 from menu            import display_menu, get_category_set, items_in_categories
 
