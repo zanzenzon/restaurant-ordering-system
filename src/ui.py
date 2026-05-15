@@ -168,9 +168,11 @@ def run():
                 tree  = OrderTree()
                 graph = RecommendationGraph()
                 fsm.transition("start")
-            elif cmd == "exit":
+            elif cmd == "2" or cmd == "exit":
                 print("  Goodbye!\n")
                 break
+            else:
+                print(yellow("  Unknown command. Use numbers 1-2 or type new/exit."))
 
         # ── STATE: CANCELLED ──────────────────────────────────────────
         elif fsm.is_cancelled():
@@ -182,9 +184,11 @@ def run():
                 tree  = OrderTree()
                 graph = RecommendationGraph()
                 fsm.transition("start")
-            elif cmd == "exit":
+            elif cmd == "2" or cmd == "exit":
                 print("  Goodbye!\n")
                 break
+            else:
+                print(yellow("  Unknown command. Use numbers 1-2 or type new/exit."))
 
 
 if __name__ == "__main__":
